@@ -2,7 +2,45 @@
 
 {% block body %}
 	<h1>Items</h1>
-	<a class="btn btn-success" href="/add_item" >Add item</a>
-	<hr>
+	<br>
+	<a class="btn btn-success fas fa-plus" href="/add_item" style="padding: 13px"><span style="font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;font-weight: normal"> Add item</span></a>
+	<br>
+	<br>
+	<table class="table table-hover">
+		<thead class="thead-light">
+			<tr>
+				<th>Item</th>
+				<th>Price</th>
+				<th>Store</th>
+				<th>Description</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% if items %}
+				{% for item in items %}
+				<tr>
+					<td>{{ item.item }}</td>
+					<td>${{ item.price }}</td>
+					<td>{{ item.store }}</td>
+					<td>{{ item.description }}</td>
+					<td style="padding-right: 0"><a href="/{{item.item}}" class="far fa-edit icon float-right"></a></td>
+					<td style="padding-left: 0"><a href="#" class="far fa-trash-alt icon float-right"></a></td>	
+				</tr>
+				{% endfor %}
+			{% else %}
+				<tr>
+					<td>{{ msg }}</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			{% endif %}
+
+		</tbody>
+	</table>
 
 {% endblock %}

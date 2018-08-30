@@ -93,7 +93,8 @@ def login():
 				session['logged_in'] = True
 				session['email'] = email
 				session['first_name'] = first_name
-				
+				session['id'] = data['id']
+
 				cur.close()
 
 				# Retrieve last url
@@ -144,26 +145,43 @@ def logout():
 @app.route('/items')
 @is_logged_in
 def items():
+	#Create a cursor
+	cur = mysql.connection.cursor()
+
+	# Get list of items
+	result = cur.execute("SELECT * FROM items i WHERE %s = i.user_id", [session['id']])
+	if result > 0:
+		items = cur.fetchall()
+		return render_template('items.html', items=items)
+	else:
+		msg = 'No items found'
+		return render_template('items.html', msg=msg)
+
+	#Close connection
+	cur.close()
+
 	return render_template('items.html')
+
 
 
 # Add item
 @app.route('/add_item', methods=['GET', 'POST'])
 @is_logged_in
 def add_item():
-	print('here')
 	if request.method == 'POST':
 		item = request.form['item']
-		price = request.form['price']
+		price = float(request.form['price'])
 		store = request.form['store']
 		description = request.form['description']
+		if description == "":
+			description = "-"
 
 		# Create a cursor
 		cur = mysql.connection.cursor()
-		print("before")
+		
 		# Add item to database
-		cur.execute("INSERT INTO items(item, price, store, description) VALUES(%s, %s, %s, %s)", (item, price, store, description))
-		print('after')
+		cur.execute("INSERT INTO items(item, price, store, description, user_id) VALUES(%s, %s, %s, %s, %s)", (item, price, store, description, session['id']))
+
 		# Commit to database
 		mysql.connection.commit()
 
@@ -171,7 +189,7 @@ def add_item():
 		cur.close()
 
 		flash('Item added successfully', 'success')
-		print('success')
+
 		return redirect(url_for('items'))
 
 	return render_template('add_item.html')
