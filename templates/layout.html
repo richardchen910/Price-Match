@@ -14,23 +14,10 @@
 		padding: 0;
 	}
 
-	#navbarsExampleDefault {
-		height: 150%;
-		padding: 0;
-	}
-
-	ul.navbar-nav {
-		height: 150%;
-	}
-
 	.nav-item {
 		padding: 10px;
 	}
-/*
-	.nav-item:hover {
-		background-color: #e6e6e6;
-	}
-*/
+
 	.row-spacer {
 		padding: 20px;
 	}
@@ -43,7 +30,7 @@
 		width: 100%;
 		padding: 10px !important;
 	}
-	
+
 	textarea {
 		resize: none;
 	}
@@ -71,6 +58,18 @@
 	  background-color: #f8f8f8;
 	}
 
+	#delete-btn {
+		padding: 0;
+		cursor: pointer;
+		border: white;
+		background-color: white;
+		outline: none;
+	}
+
+	#delete-btn:click {
+		color: lightgray;
+	}
+
 </style>
 
 </head>
@@ -88,12 +87,6 @@
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-
-	<script>
-		$(document).ready(function() {
-			var height = $("#navbarsExampleDefault").css("height");
-		});
-	</script>
 
 </body>
 </html>
