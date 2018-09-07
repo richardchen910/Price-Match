@@ -141,6 +141,14 @@ def logout():
 	return redirect(url_for('login'))
 
 
+
+class Cart:
+	def __init__(self):
+		self._cart = []
+
+	def add_item(self):
+		pass
+
 # List of items
 @app.route('/items')
 @is_logged_in
@@ -149,18 +157,57 @@ def items():
 	cur = mysql.connection.cursor()
 
 	# Get list of items
-	result = cur.execute("SELECT * FROM items WHERE %s = user_id", [session['id']])
+	result = cur.execute("SELECT * FROM items WHERE user_id = %s", [session['id']])
+
 	if result > 0:
-		items = cur.fetchall()
-		return render_template('items.html', items=items)
+		items = cur.fetchall()	# Tuple
+		sorted_items = (sorted(items, key=(lambda entry : entry['item'])))
+		
+		# Close connection
+		cur.close()
+		
+		return render_template('items.html', items=sorted_items)
 	else:
 		msg = 'No items found'
+		
+		# Close connection
+		cur.close()
+		
 		return render_template('items.html', msg=msg)
 
-	# Close connection
-	cur.close()
-
 	return render_template('items.html')
+
+
+# Add item
+@app.route('/add_item', methods=['GET', 'POST'])
+@is_logged_in
+def add_item():
+	if request.method == 'POST':
+		item = request.form['item']
+		price = float(request.form['price'])
+		store = request.form['store']
+		description = request.form['description']
+		if len(description) == 0:
+			description = "-"
+
+		# Create a cursor
+		cur = mysql.connection.cursor()
+		
+		# Add item to database
+		cur.execute("INSERT INTO items(item, price, store, description, user_id) VALUES(%s, %s, %s, %s, %s)", (item, price, store, description, session['id']))
+
+		# Commit to DB
+		mysql.connection.commit()
+
+		# Close connection
+		cur.close()
+
+		flash('Item added successfully', 'success')
+
+		return redirect(url_for('items'))
+
+	return render_template('add_item.html')
+
 
 
 class ItemForm(Form):
@@ -188,11 +235,7 @@ def edit_item(id):
 	form.item.data = item['item']
 	form.price.data = item['price']
 	form.store.data = item['store']
-	if form.description.data == "-":
-		form.description.data = ""
-	else:
-		form.description.data = item['description']
-
+	form.description.data = item['description']
 
 	if request.method == 'POST':
 		item = request.form['item']
@@ -205,9 +248,9 @@ def edit_item(id):
 		# Create a cursor
 		cur = mysql.connection.cursor()
 
-		# Get item
-		cur.execute("UPDATE items set item=%s, price=%s, store=%s, description=%s WHERE id = %s", (item, price, store, description, id))
-
+		# Update item in items and cart tables
+		cur.execute("UPDATE items SET item=%s, price=%s, store=%s, description=%s WHERE id = %s", (item, price, store, description, id))
+			
 		# Commit to DB
 		mysql.connection.commit()
 
@@ -241,43 +284,71 @@ def delete_item(id):
 	return redirect(url_for('items'))
 
 
-# Add item
-@app.route('/add_item', methods=['GET', 'POST'])
-@is_logged_in
-def add_item():
-	if request.method == 'POST':
-		item = request.form['item']
-		price = float(request.form['price'])
-		store = request.form['store']
-		description = request.form['description']
-		if description == "":
-			description = "-"
-
-		# Create a cursor
-		cur = mysql.connection.cursor()
-		
-		# Add item to database
-		cur.execute("INSERT INTO items(item, price, store, description, user_id) VALUES(%s, %s, %s, %s, %s)", (item, price, store, description, session['id']))
-
-		# Commit to database
-		mysql.connection.commit()
-
-		#Close connection
-		cur.close()
-
-		flash('Item added successfully', 'success')
-
-		return redirect(url_for('items'))
-
-	return render_template('add_item.html')
-
-
-
-
 @app.route('/cart')
 @is_logged_in
 def cart():
+	# Create a cursor
+	cur = mysql.connection.cursor()
+
+	# Get list of cart items
+	result = cur.execute("SELECT * FROM items WHERE user_id = %s AND cart = 1", [session['id']])
+
+	if result > 0:
+		items = cur.fetchall()	# Tuple
+		sorted_items = (sorted(items, key=(lambda entry : entry['item'])))
+
+		# Close connection
+		cur.close()
+
+		return render_template('cart.html', items=sorted_items)
+	else:
+		msg = 'No items found'
+		
+		# Close connection
+		cur.close()
+
+		return render_template('cart.html', msg=msg)
+
 	return render_template('cart.html')
+
+
+@app.route('/edit_cart', methods=['GET', 'POST'])
+@is_logged_in
+def edit_cart():
+	# Create a cursor
+	cur = mysql.connection.cursor()
+
+	# Get list of items
+	result = cur.execute("SELECT * FROM items WHERE %s = user_id", [session['id']])
+
+	if result > 0:
+		items = cur.fetchall()	# Tuple
+		sorted_items = (sorted(items, key=(lambda entry : entry['item'])))
+		
+		if request.method == 'POST':
+			cart = request.form.getlist('cart')	
+			for i in cart:
+				columns = i.split(", ")
+				item, user_id = columns[0], columns[1]
+				
+				# Update cart column to 1
+				cur.execute("UPDATE items SET cart = 1 WHERE item=%s AND user_id=%s", (item, user_id))
+
+				# Commit to DB
+				mysql.connection.commit()
+
+			# Close connection
+			cur.close()
+
+			return redirect(url_for('cart'))
+
+		return render_template('edit_cart.html', items=sorted_items)
+	else:
+		# Close connection
+		cur.close()
+		
+		flash('No items can be added to your cart', 'danger')
+		return redirect(url_for('cart'))
 
 
 if __name__ == "__main__":

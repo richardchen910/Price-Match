@@ -70,6 +70,55 @@
 		color: lightgray;
 	}
 
+	#cart {
+		width: 40%;
+		border: 1px solid lightgray;
+		box-shadow: 1px 1px 10px lightgray;
+	}
+
+	#cart td:empty {
+		border-left: 0;
+		border-right: 0;
+	}
+
+	#cart thead, tbody {
+		width: 100%;
+	}
+
+	.scrollit {
+		overflow-y: auto;
+		height: 550px;
+	}
+
+	#cart tbody {
+		height: 550px;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	.cart-header {
+		text-align: center;
+		border-color: lightgray; 
+		border-width: 0px 0px 1px;
+		padding: 18px 0px;
+	}
+
+	#empty-cart {
+		padding-top: 200px;
+		padding-bottom: 0px;
+		text-align: center;
+	}
+
+	.center {
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.cart-btn {
+		width: 20%;
+	}
+
 </style>
 
 </head>
@@ -82,11 +131,29 @@
 				{% include 'includes/_messages.html' %}
 			</div>
 		</div>
-		{% block body %}{% endblock %}
 	</div>
+	{% block body %}{% endblock %}
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+
+	<!-- Confirm delete when user deletes item -->
+	<script>
+		function confirmDelete() {
+			return confirm("Are you sure you want to delete this item?");
+		}
+	</script>
+
+	<script>
+		/*
+		$(document).ready(function() {
+			var containerWidth = document.getElementsByClassName("table-header")[0].offsetWidth;
+			$("table").find("th").css("width", containerWidth);
+			$("table").find("td").css("width", containerWidth);
+		});
+		*/
+
+	</script>
 
 </body>
 </html>

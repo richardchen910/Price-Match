@@ -1,5 +1,68 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-	<h1>Shopping Cart</h1>
+	<div class="row-spacer"></div>
+	<div class="container">
+		<table id="cart" class="table" align="center" style="background-color: #ffffcc">
+			<thead class="table-header">
+				<tr>
+					<th colspan="2" class="cart-header">Cart</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% if items %}
+					{% for item in items %}
+					<tr style="line-height: 25px; height: 25px">
+						<td>{{ item.item }}</td>
+						<td>{{ item.store }}</td>
+					</tr>
+					{% endfor %}
+					<tr>
+						<td>hello</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>hello</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>hello</td>
+						<td></td>
+					</tr>
+					<!--
+					<tr>
+						<td>hello</td>
+					</tr>
+					<tr>
+						<td>hello</td>
+					</tr>
+					<tr>
+						<td>hello</td>
+					</tr>
+					<tr>
+						<td>hello</td>
+					</tr>
+					<tr>
+						<td>hello</td>
+					</tr>
+					<tr>
+						<td>hello</td>
+					</tr>
+				-->
+					<tr>
+						<td></td>
+						<td></td>
+					</tr>
+
+				{% else %}
+					<tr>
+						<td id="empty-cart">No items in cart</td>
+					</tr>
+				{% endif %}
+			</tbody>
+		</table>
+	</div>
+	<a class="btn btn-primary cart-btn center" href="/edit_cart" style="margin-bottom: 10px; margin-top: 10px">Edit</a>
+	<a class="btn btn-secondary cart-btn center" href="#">Reset</a>
+
 {% endblock %}
